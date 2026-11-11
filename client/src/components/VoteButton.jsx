@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -8,6 +8,14 @@ export default function VoteButton({ ideaId, voted, voteCount, disabled }) {
   const queryClient = useQueryClient();
   const [optimisticVoted, setOptimisticVoted] = useState(voted);
   const [optimisticCount, setOptimisticCount] = useState(voteCount ?? 0);
+
+  useEffect(() => {
+    setOptimisticVoted(voted);
+  }, [voted]);
+
+  useEffect(() => {
+    setOptimisticCount(voteCount ?? 0);
+  }, [voteCount]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => api.post(`/api/ideas/${ideaId}/vote`, {}),

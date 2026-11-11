@@ -1,4 +1,7 @@
 const INVESTOR_META = {
+  strict: { emoji: '🧐', label: 'Seth Sahab' },
+  funny: { emoji: '😂', label: 'Bhai Jaan Comedian' },
+  dreamer: { emoji: '🌈', label: 'Visionary Aapa' },
   'Seth Sahab': { emoji: '🧐', label: 'Seth Sahab' },
   'Bhai Jaan Comedian': { emoji: '😂', label: 'Bhai Jaan Comedian' },
   'Visionary Aapa': { emoji: '🌈', label: 'Visionary Aapa' },
@@ -71,7 +74,7 @@ export default function InvestorCard({ roast }) {
       {/* Offer */}
       {offer && (
         <div className="text-sm font-medium text-green-400 bg-green-900/20 border border-green-800/40 rounded-lg px-3 py-2">
-          💰 Offer: Rs {offer.amount?.toLocaleString()} lakh for {offer.equity}%
+          💰 Offer: Rs {(offer.amountLakh ?? offer.amount)?.toLocaleString()} lakh for {offer.equityPercent ?? offer.equity}%
         </div>
       )}
     </div>
