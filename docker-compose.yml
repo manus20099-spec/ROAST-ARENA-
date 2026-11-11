@@ -1,0 +1,15 @@
+# Starts a local MongoDB so you do not need to install it.
+#   docker compose up -d
+# Then use MONGODB_URI=mongodb://127.0.0.1:27017/roast-arena (the default).
+services:
+  mongo:
+    image: mongo:7
+    container_name: roast-arena-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - roast_arena_data:/data/db
+
+volumes:
+  roast_arena_data:
