@@ -11,11 +11,28 @@ const server = http.createServer(app);
 // Connect real-time socket layer
 initRealtime(server);
 
+let memoryServer = null;
+
 // Database connection & startup jobs
 async function start() {
   try {
-    await mongoose.connect(config.mongoUri);
-    console.log(`[db] Connected to MongoDB at ${config.mongoUri}`);
+    let mongoUri = config.mongoUri;
+    try {
+      await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 2000 });
+      console.log(`[db] Connected to MongoDB at ${mongoUri}`);
+    } catch (err) {
+      console.warn(`[db] Local MongoDB at ${mongoUri} not reachable: ${err.message}`);
+      console.log(`[db] Starting embedded in-memory MongoDB server...`);
+      const { MongoMemoryServer } = await import('mongodb-memory-server');
+      memoryServer = await MongoMemoryServer.create();
+      mongoUri = memoryServer.getUri();
+      await mongoose.connect(mongoUri);
+      console.log(`[db] Connected to in-memory MongoDB at ${mongoUri}`);
+
+      // Auto-seed in-memory database so the app is instantly populated
+      const { seed } = await import('./seed.js');
+      await seed({ disconnect: false });
+    }
 
     // AI Provider status
     console.log(`[ai] Active AI provider: ${config.ai.provider}`);
@@ -61,6 +78,7 @@ async function shutdown() {
   server.close(async () => {
     try {
       await mongoose.disconnect();
+      if (memoryServer) await memoryServer.stop();
       console.log('[server] Mongoose disconnected. Goodbye!');
       process.exit(0);
     } catch {

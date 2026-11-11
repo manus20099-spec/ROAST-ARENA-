@@ -12,9 +12,11 @@ import { Roast } from './models/Roast.js';
 import { User } from './models/User.js';
 import { Vote } from './models/Vote.js';
 
-async function seed() {
-  console.log('[seed] Connecting to MongoDB...');
-  await mongoose.connect(config.mongoUri);
+export async function seed({ disconnect = true } = {}) {
+  if (mongoose.connection.readyState === 0) {
+    console.log('[seed] Connecting to MongoDB...');
+    await mongoose.connect(config.mongoUri);
+  }
 
   console.log('[seed] Dropping existing collections...');
   await Promise.all([
@@ -446,10 +448,15 @@ async function seed() {
   console.log('- Community votes & comments created & score computed');
   console.log('=========================================\n');
 
-  await mongoose.disconnect();
+  if (disconnect) {
+    await mongoose.disconnect();
+  }
 }
 
-seed().catch((err) => {
-  console.error('[seed] Fatal error:', err);
-  process.exit(1);
-});
+// Auto-run if executed directly
+if (process.argv[1] && process.argv[1].endsWith('seed.js')) {
+  seed({ disconnect: true }).catch((err) => {
+    console.error('[seed] Fatal error:', err);
+    process.exit(1);
+  });
+}

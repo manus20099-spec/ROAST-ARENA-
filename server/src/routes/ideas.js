@@ -14,7 +14,6 @@ import {
   reportComment,
 } from '../services/comments.js';
 import {
-  createIdea,
   deleteIdea,
   getIdeaDetail,
   listIdeas,
@@ -22,7 +21,7 @@ import {
   serializePitch,
   updateIdeaMeta,
 } from '../services/ideas.js';
-import { addPitch, getPitchForViewer } from '../services/pitches.js';
+import { addPitch, createIdea, getPitchForViewer } from '../services/pitches.js';
 import { removeImage, saveImage } from '../services/uploads.js';
 import { toggleVote } from '../services/votes.js';
 import {
