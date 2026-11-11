@@ -163,9 +163,14 @@ describe('Ideas & Pitches API (/api/ideas)', () => {
     });
 
     it('toggles vote on and off for eligible voter', async () => {
-      // Create pitch & roasts
+      const idea = await Idea.create({
+        founder: founder._id,
+        title: 'Votable Idea',
+        pitchCount: 1,
+      });
+
       const pitch = await Pitch.create({
-        idea: null,
+        idea: idea._id,
         founder: founder._id,
         version: 1,
         problem: 'Test problem description with minimum length requirements.',
@@ -177,18 +182,11 @@ describe('Ideas & Pitches API (/api/ideas)', () => {
         aiAverage: 8,
       });
 
-      const idea = await Idea.create({
-        founder: founder._id,
-        title: 'Votable Idea',
-        pitchCount: 1,
-        rankedPitch: pitch._id,
-        rankedAt: pitch.completedAt,
-        aiScore: 8,
-        score: 48,
-      });
-
-      pitch.idea = idea._id;
-      await pitch.save();
+      idea.rankedPitch = pitch._id;
+      idea.rankedAt = pitch.completedAt;
+      idea.aiScore = 8;
+      idea.score = 48;
+      await idea.save();
 
       // Vote ON
       const voteOnRes = await request(app)
